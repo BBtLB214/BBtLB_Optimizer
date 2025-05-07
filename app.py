@@ -3,7 +3,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "BBtLB_Optimizer")))
 import streamlit as st
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from main import run_full_pipeline  # assuming run_full_pipeline() exists in BBtLB_Optimizer/main.py
+import ServiceAccountCredentials
 import pandas as pd
 
 st.set_page_config(page_title="BBtLB Fantasy Lineup Generator", layout="wide")
