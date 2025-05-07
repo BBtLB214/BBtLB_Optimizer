@@ -1,3 +1,5 @@
 streamlit>=1.28
-streamlit_gsheets
+gspread
+oauth2client
 pandas
+
