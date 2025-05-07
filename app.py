@@ -1,28 +1,22 @@
 import streamlit as st
-from BBtLB_Optimizer import main as bbtlb_main
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 
 st.set_page_config(page_title="BBtLB Fantasy Lineup Generator", layout="wide")
-
 st.title("🧠 Big Bank Take Little Bank (BBtLB)")
-st.markdown("Generate fantasy lineups and props for DraftKings, FanDuel, PrizePicks, and Underdog.")
 
-platform = st.selectbox("Choose Platform", ["DraftKings", "FanDuel", "PrizePicks", "Underdog"])
-run_button = st.button("🚀 Run BBtLB Optimizer")
+# Connect to Google Sheets
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_service_account"], scope)
+client = gspread.authorize(creds)
 
-if run_button:
-    st.info("Running projections and simulations...")
-    try:
-        output = bbtlb_main.run_full_pipeline(platform=platform)
+SHEET_NAME = "Players"
+SHEET_URL = st.secrets["gsheets_url"]
+sheet = client.open_by_url(SHEET_URL).worksheet(SHEET_NAME)
+data = sheet.get_all_records()
+df = pd.DataFrame(data)
 
-        if platform in ["DraftKings", "FanDuel"]:
-            for i, lineup in enumerate(output['lineups'], 1):
-                st.subheader(f"{platform} Lineup #{i}")
-                st.dataframe(pd.DataFrame(lineup))
+st.subheader("📊 Player Projections")
+st.dataframe(df)
 
-        elif platform in ["PrizePicks", "Underdog"]:
-            st.subheader(f"{platform} Top Props")
-            st.dataframe(pd.DataFrame(output['props']))
-
-    except Exception as e:
-        st.error(f"Error running BBtLB optimizer: {e}")
