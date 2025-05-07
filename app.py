@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "BBtLB_Optimizer")))
 import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
