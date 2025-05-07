@@ -1,1 +1,2 @@
-.streamlit/secrets.toml
+echo ".streamlit/secrets.toml" >> .gitignore
+
