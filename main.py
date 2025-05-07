@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 import os
 from BBtLB_Optimizer.fetchers import fetch_api_data, load_model_data, get_opponent_stats, load_props_data
 from BBtLB_Optimizer.projections import get_player_projections
