@@ -1,12 +1,22 @@
-# Placeholder functions for fetching data from APIs
+import pandas as pd
+
 def fetch_api_data():
-    return {"players": [{"id": "player1", "opponent": "teamA"}]}  # Simulated response
+    return pd.DataFrame([
+        {"Player": "John Doe", "Salary": 8000, "Team": "AAA"},
+        {"Player": "Jane Smith", "Salary": 7500, "Team": "BBB"}
+    ])
 
 def load_model_data():
-    return {"player1": {"base": {"median": 20, "floor": 10, "ceiling": 30}}}
+    return {}
 
 def get_opponent_stats():
-    return {"teamA": {"multiplier": 1.1}}
+    return pd.DataFrame([
+        {"Team": "AAA", "Defense_Rank": 5},
+        {"Team": "BBB", "Defense_Rank": 15}
+    ])
 
 def load_props_data():
-    return {"player1": [{"stat": "points", "line": 22.5, "correlation": 0.75}]}
+    return pd.DataFrame([
+        {"Player": "John Doe", "Stat": "Points", "Line": 22.5},
+        {"Player": "Jane Smith", "Stat": "Rebounds", "Line": 8.0}
+    ])
