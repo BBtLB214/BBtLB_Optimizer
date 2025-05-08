@@ -2,12 +2,13 @@
 
 import streamlit as st
 import pandas as pd
+import sys
+import os
 
-# Dual-mode import for Streamlit support
-try:
-    from . import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
-except ImportError:
-    from BBtLB_Optimizer import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
+# Ensure root path is in sys.path for import compatibility
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from BBtLB_Optimizer import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
 
 st.set_page_config(page_title="BBtLB Optimizer", layout="wide")
 st.title("🏈 BBtLB Optimizer Dashboard")
