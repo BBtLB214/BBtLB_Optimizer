@@ -1,47 +1,50 @@
-# BBtLB_Optimizer/ownership_leverage.py
+# ownership_leverage.py
 
-import pandas as pd
-from monte_carlo_sim import run_monte_carlo
+import os
+import requests
+from dotenv import load_dotenv
 
-# Threshold to identify good leverage opportunities
-LEVERAGE_THRESHOLD = 1.5
+# Load environment variables from a .env file
+load_dotenv()
 
+# Retrieve API key from environment variables
+SPORTSDATAIO_API_KEY = os.getenv("SPORTSDATAIO_API_KEY")
 
-def mock_ownership_projection(players):
-    # Placeholder: Replace with real ownership projection logic
-    # Assign mock ownership between 5-40%
-    import numpy as np
-    return {p['Player']: np.random.uniform(5, 40) for p in players}
+# Base URL for SportsDataIO's DFS Ownership Projections API
+BASE_URL = "https://api.sportsdata.io/v4/nfl/dfs/ownership"
 
+def fetch_ownership_projections():
+    headers = {
+        "Ocp-Apim-Subscription-Key": SPORTSDATAIO_API_KEY
+    }
+    try:
+        response = requests.get(BASE_URL, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return data
+    except requests.RequestException as e:
+        print(f"Error fetching ownership projections: {e}")
+        return None
 
-def compute_leverage(sim_df: pd.DataFrame, ownership_map: dict):
-    leverage_list = []
-    for _, row in sim_df.iterrows():
-        player = row['Player']
-        median = row['Sim_Median']
-        ownership = ownership_map.get(player, 10.0)
+def display_ownership_projections(data):
+    if not data:
+        print("No data to display.")
+        return
 
-        leverage_score = round((median / row['Salary']) / (ownership / 100), 2)
-        if leverage_score >= LEVERAGE_THRESHOLD:
-            leverage_list.append({
-                "Player": player,
-                "Proj": median,
-                "Ownership%": round(ownership, 2),
-                "Leverage": leverage_score
-            })
+    print("Player Ownership Projections:")
+    print(f"{'Player':<25} {'Team':<10} {'Position':<10} {'DK Ownership':<15} {'FD Ownership':<15}")
+    print("-" * 75)
+    for player in data:
+        name = player.get("Name", "N/A")
+        team = player.get("Team", "N/A")
+        position = player.get("Position", "N/A")
+        dk_ownership = player.get("DraftKingsOwnershipPercentage", "N/A")
+        fd_ownership = player.get("FanDuelOwnershipPercentage", "N/A")
+        print(f"{name:<25} {team:<10} {position:<10} {dk_ownership:<15} {fd_ownership:<15}")
 
-    return pd.DataFrame(leverage_list).sort_values(by="Leverage", ascending=False)
+def main():
+    data = fetch_ownership_projections()
+    display_ownership_projections(data)
 
-
-def run_leverage_analysis():
-    sim_df = run_monte_carlo()
-    sim_df['Salary'] = 5000  # Replace with actual salary feed if available
-    ownership_map = mock_ownership_projection(sim_df.to_dict(orient='records'))
-    leverage_df = compute_leverage(sim_df, ownership_map)
-    return leverage_df
-
-
-if __name__ == '__main__':
-    df = run_leverage_analysis()
-    print("Top Leverage Plays:")
-    print(df.head(10))
+if __name__ == "__main__":
+    main()
