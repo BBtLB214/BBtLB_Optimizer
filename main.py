@@ -1,13 +1,13 @@
 # BBtLB_Optimizer/main.py
 
 import argparse
-from BBtLB_Optimizer import (
-    prop_picker,
-    ownership_leverage,
-    dk_fd_builder,
-    projection_engine
-)
 import pandas as pd
+
+# Dual-mode import compatibility (for direct CLI or -m execution)
+try:
+    from . import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
+except ImportError:
+    from BBtLB_Optimizer import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
 
 
 def run_prop_picker():
@@ -25,9 +25,8 @@ def run_ownership_leverage():
 
 def run_lineup_builder():
     print("[INFO] Running DK/FD Lineup Builder...")
-    # Add CLI-level stub if dk_fd_builder exposes main() or similar
-    # Example placeholder
-    print("[WARN] Lineup builder not fully integrated.")
+    # Placeholder - integrate builder logic here
+    print("[WARN] Lineup builder integration pending.")
 
 
 def run_projection_engine():
