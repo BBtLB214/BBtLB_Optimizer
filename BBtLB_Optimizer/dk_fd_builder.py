@@ -2,6 +2,7 @@
 
 import pandas as pd
 from monte_carlo_sim import run_monte_carlo
+from projection_engine import get_player_projections
 
 SALARY_CAPS = {
     'DraftKings': 50000,
@@ -31,7 +32,7 @@ ROSTER_RULES = {
 def is_valid_lineup(lineup, sport):
     if len(lineup) != ROSTER_RULES[sport]['size']:
         return False
-    return True  # More complex logic can be added here for positional rules
+    return True
 
 
 def value_score(player):
@@ -87,9 +88,12 @@ def format_lineups(lineups):
 
 def run_optimizer():
     sim_df = run_monte_carlo()
-    sim_df['Salary'] = 5000  # TODO: Replace with real salaries
-    sim_df['Sport'] = 'NBA'  # TODO: Pull actual sport field
-    sim_df['Position'] = 'UTIL'  # TODO: Replace with actual positions
+    projections = get_player_projections()
+    proj_map = {p['Player']: p for p in projections}
+
+    sim_df['Salary'] = sim_df['Player'].apply(lambda name: proj_map.get(name, {}).get('Salary', 5000))
+    sim_df['Sport'] = sim_df['Player'].apply(lambda name: proj_map.get(name, {}).get('Sport', 'NBA'))
+    sim_df['Position'] = sim_df['Player'].apply(lambda name: proj_map.get(name, {}).get('Position', 'UTIL'))
 
     results = {}
     for sport in ROSTER_RULES:
