@@ -1,13 +1,19 @@
-# BBtLB_Optimizer/main.py
-
 import argparse
 import pandas as pd
+import sys
+import os
 
-# Dual-mode import compatibility (for direct CLI or -m execution)
+# Ensure the current script directory is in the Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Dual-mode import compatibility (for direct CLI or standalone execution)
 try:
     from . import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
 except ImportError:
-    from BBtLB_Optimizer import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
+    import prop_picker
+    import ownership_leverage
+    import dk_fd_builder
+    import projection_engine
 
 
 def run_prop_picker():
