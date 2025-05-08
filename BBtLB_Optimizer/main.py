@@ -2,12 +2,12 @@
 
 import argparse
 import pandas as pd
-from . import (
-    prop_picker,
-    ownership_leverage,
-    dk_fd_builder,
-    projection_engine
-)
+
+# Dual-mode import compatibility (for direct CLI or -m execution)
+try:
+    from . import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
+except ImportError:
+    from BBtLB_Optimizer import prop_picker, ownership_leverage, dk_fd_builder, projection_engine
 
 
 def run_prop_picker():
