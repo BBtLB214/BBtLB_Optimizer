@@ -1,48 +1,56 @@
-# main.py
+# BBtLB_Optimizer/main.py
 
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from projection_engine import get_player_projections
-from dk_fd_builder import run_optimizer as run_lineup_optimizer
-from prop_picker import run_prop_picker
-from sheets_connector import write_to_sheet
-
-GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID", "14cQkxZSrMiTBlMMrFXg7V3M-sF1vMdErvHiX29yXFgU")
-GOOGLE_CREDS_PATH = os.getenv("GOOGLE_SHEETS_CREDENTIALS", "credentials/psychic-raceway-459107-q0-4e66ae2a0716.json")
+import argparse
+from BBtLB_Optimizer import (
+    prop_picker,
+    ownership_leverage,
+    dk_fd_builder,
+    projection_engine
+)
+import pandas as pd
 
 
-def run_optimizer():
-    # Get player projections (BBtLB model)
-    projections = get_player_projections()
-
-    # Run DFS lineup optimizer
-    lineups = run_lineup_optimizer()
-
-    # Run correlated prop picks
-    props = run_prop_picker()
-
-    # Output prop picks to Google Sheets
-    sheet_output = [["Player", "Prop", "Line", "Proj", "Edge", "Reason", "Risk"]]
-    sheet_output += [[p['Player'], p['Prop'], p['Line'], p['Proj'], p['Edge'], p['Reason'], p['Risk']] for p in props]
-
-    updated_cells = write_to_sheet(GOOGLE_SHEET_ID, 'Sheet1!G1', sheet_output, GOOGLE_CREDS_PATH)
-    print(f"{updated_cells} cells updated in Google Sheet.")
-
-    # Local print
-    print("\nTop DraftKings Lineup:")
-    for p in lineups['DraftKings'][0]:
+def run_prop_picker():
+    print("[INFO] Running Prop Picker...")
+    sim_df = prop_picker.run_monte_carlo()
+    picks = prop_picker.pick_props(sim_df)
+    for p in picks:
         print(p)
 
-    print("\nTop FanDuel Lineup:")
-    for p in lineups['FanDuel'][0]:
-        print(p)
 
-    print("\nTop Props:")
-    for p in props:
-        print(p)
+def run_ownership_leverage():
+    print("[INFO] Running Ownership Leverage...")
+    ownership_leverage.main()
+
+
+def run_lineup_builder():
+    print("[INFO] Running DK/FD Lineup Builder...")
+    # Add CLI-level stub if dk_fd_builder exposes main() or similar
+    # Example placeholder
+    print("[WARN] Lineup builder not fully integrated.")
+
+
+def run_projection_engine():
+    print("[INFO] Running Projection Engine...")
+    projections = projection_engine.generate_projections()
+    print(pd.DataFrame(projections).head())
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run BBtLB Optimizer modules")
+    parser.add_argument("--module", choices=["prop", "ownership", "lineup", "projection"],
+                        required=True, help="Module to run")
+    args = parser.parse_args()
+
+    if args.module == "prop":
+        run_prop_picker()
+    elif args.module == "ownership":
+        run_ownership_leverage()
+    elif args.module == "lineup":
+        run_lineup_builder()
+    elif args.module == "projection":
+        run_projection_engine()
 
 
 if __name__ == "__main__":
-    run_optimizer()
+    main()
